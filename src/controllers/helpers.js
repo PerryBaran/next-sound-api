@@ -65,7 +65,7 @@ const getOptions = (model) => {
   }
 };
 
-exports.create = async (req, res, directory, model) => {
+exports.create = async (req, res, model) => {
   const { body } = req;
   const Model = getModel(model);
 
