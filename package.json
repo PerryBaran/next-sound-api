@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "chai": "^5.0.0",
+    "chai": "^4.3.7",
     "dotenv": "^16.3.1",
     "eslint": "^8.56.0",
     "mocha": "^10.2.0",
