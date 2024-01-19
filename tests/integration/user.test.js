@@ -7,7 +7,7 @@ const sinon = require('sinon');
 
 describe('/users', () => {
   let validData;
-  
+
   before(async () => {
     try {
       await User.sequelize.sync({ force: true });
@@ -22,7 +22,7 @@ describe('/users', () => {
       email: 'valid@email.com',
       password: 'validPassword',
     };
-  })
+  });
 
   afterEach(async () => {
     try {
@@ -56,7 +56,7 @@ describe('/users', () => {
     });
 
     it('returns 400 if name is empty', async () => {
-      validData.name = ''
+      validData.name = '';
       const { status, body } = await request(app)
         .post('/users/signup')
         .send(validData);
@@ -66,7 +66,7 @@ describe('/users', () => {
     });
 
     it('returns 400 if email is empty', async () => {
-      validData.email = ''
+      validData.email = '';
       const { status, body } = await request(app)
         .post('/users/signup')
         .send(validData);

@@ -66,7 +66,7 @@ describe('/songs', () => {
     it('creates a new song in the database', async () => {
       const { status, body } = await request(app)
         .post('/songs')
-        .send(validData)
+        .send(validData);
       const newSongRecord = await Song.findByPk(body.id, {
         raw: true,
       });
@@ -80,11 +80,11 @@ describe('/songs', () => {
     });
 
     it("returns 404 if AlbumId doesn't match a song of a valid User", async () => {
-      validData.AlbumId = 'aa31b7c4-7784-423e-8263-4d3ab6109990'
-      
+      validData.AlbumId = 'aa31b7c4-7784-423e-8263-4d3ab6109990';
+
       const { status, body } = await request(app)
         .post('/songs')
-        .send(validData)
+        .send(validData);
 
       expect(status).to.equal(500);
       expect(body.message).to.equal(
@@ -94,56 +94,55 @@ describe('/songs', () => {
 
     it('returns 500 if name is undefined', async () => {
       validData.name = undefined;
-      
+
       const { status, body } = await request(app)
         .post('/songs')
-        .send(validData)
+        .send(validData);
 
       expect(status).to.equal(500);
       expect(body.message).to.equal(
         'Error: notNull Violation: Must provide a song name'
       );
-    })
+    });
 
     it('returns 500 if name is empty', async () => {
       validData.name = '';
-      
+
       const { status, body } = await request(app)
         .post('/songs')
-        .send(validData)
+        .send(validData);
 
       expect(status).to.equal(500);
       expect(body.message).to.equal(
         'Error: Validation error: The song name cannot be empty'
       );
-    })
+    });
 
     it('returns 500 if position is undefined', async () => {
       validData.position = undefined;
-      
+
       const { status, body } = await request(app)
         .post('/songs')
-        .send(validData)
+        .send(validData);
 
       expect(status).to.equal(500);
       expect(body.message).to.equal(
         'Error: notNull Violation: Must provide a song position'
       );
-    })
+    });
 
     it('returns 500 if position is empty', async () => {
       validData.position = '';
-      
+
       const { status, body } = await request(app)
         .post('/songs')
-        .send(validData)
+        .send(validData);
 
       expect(status).to.equal(500);
       expect(body.message).to.equal(
         'Error: Validation error: The position cannot be empty'
       );
-    })
-
+    });
 
     it('works if url is undefined', async () => {
       validData.url = undefined;
@@ -218,7 +217,9 @@ describe('/songs', () => {
         });
 
         it('returns 404 if no song exists with the specified id', async () => {
-          const { status, body } = await request(app).get('/songs/c89f9fac-7f9a-4c30-9349-2be810023589');
+          const { status, body } = await request(app).get(
+            '/songs/c89f9fac-7f9a-4c30-9349-2be810023589'
+          );
 
           expect(status).to.equal(404);
           expect(body.message).to.equal('The song could not be found.');
@@ -231,7 +232,7 @@ describe('/songs', () => {
           const song = songs[0];
           const { status } = await request(app)
             .patch(`/songs/${song.id}`)
-            .send(newData)
+            .send(newData);
           const updatedSongRecord = await Song.findByPk(song.id, {
             raw: true,
           });
@@ -244,7 +245,7 @@ describe('/songs', () => {
           const newData = { name: 'newName' };
           const { status, body } = await request(app)
             .patch('/songs/c89f9fac-7f9a-4c30-9349-2be810023589')
-            .send(newData)
+            .send(newData);
 
           expect(status).to.equal(404);
           expect(body.message).to.equal('The song could not be found');
@@ -264,7 +265,9 @@ describe('/songs', () => {
         });
 
         it('returns 404 if no song exists with the specified id', async () => {
-          const { status } = await request(app).delete('/songs/c89f9fac-7f9a-4c30-9349-2be810023589');
+          const { status } = await request(app).delete(
+            '/songs/c89f9fac-7f9a-4c30-9349-2be810023589'
+          );
 
           expect(status).to.equal(404);
         });
