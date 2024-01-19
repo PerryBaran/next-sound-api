@@ -8,7 +8,7 @@ const sinon = require('sinon');
 describe('/users', () => {
   before(async () => {
     try {
-      await User.sequelize.sync({ force: true});
+      await User.sequelize.sync({ force: true });
     } catch (err) {
       console.error(err);
     }
@@ -291,7 +291,9 @@ describe('/users', () => {
         });
 
         it('returns 404 if no user exists with the specified id', async () => {
-          const { status, body } = await request(app).get('/users/bf65bf17-10ed-43b8-8f05-15a85648fdc9');
+          const { status, body } = await request(app).get(
+            '/users/bf65bf17-10ed-43b8-8f05-15a85648fdc9'
+          );
 
           expect(status).to.equal(404);
           expect(body.message).to.equal('The user could not be found.');
@@ -330,7 +332,7 @@ describe('/users', () => {
         });
 
         it("returns 404 if the user doesn't exist", async () => {
-          const id = "bf65bf17-10ed-43b8-8f05-15a85648fdc9";
+          const id = 'bf65bf17-10ed-43b8-8f05-15a85648fdc9';
           authStub.callsFake((req, _, next) => {
             req.user = { id: id };
             next();
@@ -374,7 +376,7 @@ describe('/users', () => {
       });
 
       it("returns 404 if the user doesn't exist", async () => {
-        const id = "bf65bf17-10ed-43b8-8f05-15a85648fdc9";
+        const id = 'bf65bf17-10ed-43b8-8f05-15a85648fdc9';
         authStub.callsFake((req, _, next) => {
           req.user = { id: id };
           next();

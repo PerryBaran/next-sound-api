@@ -1,10 +1,10 @@
 module.exports = (connection, DataTypes) => {
   const schema = {
-    id : {
+    id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
     },
     name: {
       type: DataTypes.STRING,

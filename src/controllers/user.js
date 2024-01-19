@@ -101,8 +101,8 @@ exports.patch = async (req, res) => {
     const data = {
       name,
       email,
-      password: password && await bcrypt.hash(password, 10),
-    }
+      password: password && (await bcrypt.hash(password, 10)),
+    };
 
     await helpers.patch(data, id, res, 'user');
   } catch (err) {
@@ -135,7 +135,7 @@ exports.delete = async (req, res) => {
     if (!passwordsMatch)
       return res.status(401).send({ message: 'Invalid Credentials' });
 
-    await helpers.delete(userId, res, 'user')
+    await helpers.delete(userId, res, 'user');
   } catch (err) {
     res.status(500).send({
       message: err.message ? `Error: ${err.message}` : 'Unexpected error',
