@@ -23,18 +23,8 @@ module.exports = (connection, DataTypes) => {
     },
     url: {
       type: DataTypes.STRING,
-      allowNull: false,
-      allowEmpty: false,
-      validate: {
-        notNull: {
-          args: true,
-          msg: 'Must provide an audio file',
-        },
-        notEmpty: {
-          args: true,
-          msg: 'The audio file cannot be empty',
-        },
-      },
+      allowNull: true,
+      allowEmpty: true,
     },
     position: {
       type: DataTypes.INTEGER,
