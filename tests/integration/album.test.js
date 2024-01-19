@@ -27,7 +27,7 @@ describe('/albums', () => {
       user = await User.create(fakeUserData);
       validData = {
         name: 'validName',
-        url: `url.com/${user.id}/bf65bf17-10ed-43b8-8f05-15a85648fdc9`,
+        url: `${user.id}/bf65bf17-10ed-43b8-8f05-15a85648fdc9`,
         UserId: user.id,
       };
 
@@ -66,7 +66,7 @@ describe('/albums', () => {
       expect(newAlbumRecord.name).to.equal(body.name);
     });
 
-    it('returns specific error message if name is undefined', async () => {
+    it('returns 500 if name is undefined', async () => {
       validData.name = undefined;
 
       const { status, body } = await request(app)
@@ -79,20 +79,7 @@ describe('/albums', () => {
       );
     });
 
-    it('returns specific error message if name is undefined', async () => {
-      validData.name = undefined;
-
-      const { status, body } = await request(app)
-        .post('/albums')
-        .send(validData);
-
-      expect(status).to.equal(500);
-      expect(body.message).to.equal(
-        'Error: notNull Violation: Must provide an album name'
-      );
-    });
-
-    it('returns specific error message if name is empty', async () => {
+    it('returns 500 if name is empty', async () => {
       validData.name = '';
 
       const { status, body } = await request(app)

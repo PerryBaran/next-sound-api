@@ -6,6 +6,8 @@ const { authStub, app } = require('../test-config');
 const sinon = require('sinon');
 
 describe('/users', () => {
+  let validData;
+  
   before(async () => {
     try {
       await User.sequelize.sync({ force: true });
@@ -13,6 +15,14 @@ describe('/users', () => {
       console.error(err);
     }
   });
+
+  beforeEach(() => {
+    validData = {
+      name: 'validName',
+      email: 'valid@email.com',
+      password: 'validPassword',
+    };
+  })
 
   afterEach(async () => {
     try {
@@ -25,82 +35,61 @@ describe('/users', () => {
 
   describe('POST /users/signup', () => {
     it('creates a new user in the database', async () => {
-      const data = {
-        name: 'validName',
-        email: 'valid@email.com',
-        password: 'validPassword',
-      };
       const { status, body } = await request(app)
         .post('/users/signup')
-        .send(data);
+        .send(validData);
       const newUserRecord = await User.unscoped().findByPk(body.id, {
         raw: true,
       });
 
       const passwordsMatch = await bcrypt.compare(
-        data.password,
+        validData.password,
         newUserRecord.password
       );
 
       expect(status).to.equal(201);
-      expect(body.name).to.equal(data.name);
-      expect(body.email).to.equal(data.email);
-      expect(newUserRecord.name).to.equal(data.name);
-      expect(newUserRecord.email).to.equal(data.email);
+      expect(body.name).to.equal(validData.name);
+      expect(body.email).to.equal(validData.email);
+      expect(newUserRecord.name).to.equal(validData.name);
+      expect(newUserRecord.email).to.equal(validData.email);
       expect(passwordsMatch).to.be.true;
     });
 
     it('returns 400 if name is empty', async () => {
-      const data = {
-        name: '',
-        email: 'valid@email.com',
-        password: 'validPassword',
-      };
+      validData.name = ''
       const { status, body } = await request(app)
         .post('/users/signup')
-        .send(data);
+        .send(validData);
 
       expect(status).to.equal(400);
       expect(body.message).to.equal('Name must have a value');
     });
 
     it('returns 400 if email is empty', async () => {
-      const data = {
-        name: 'validName',
-        email: '',
-        password: 'validPassword',
-      };
+      validData.email = ''
       const { status, body } = await request(app)
         .post('/users/signup')
-        .send(data);
+        .send(validData);
 
       expect(status).to.equal(400);
       expect(body.message).to.equal('Email must have a value');
     });
 
     it('returns 400 if email is not valid', async () => {
-      const data = {
-        name: 'validName',
-        email: 'notValidEmail',
-        password: 'validPassword',
-      };
+      validData.email = 'notValidEmail';
       const { status, body } = await request(app)
         .post('/users/signup')
-        .send(data);
+        .send(validData);
 
       expect(status).to.equal(400);
       expect(body.message).to.equal('Email must be valid');
     });
 
     it('returns 400 if password is less than 8 characters', async () => {
-      const data = {
-        name: 'validName',
-        email: 'valid@email.com',
-        password: '',
-      };
+      validData.password = '';
       const { status, body } = await request(app)
         .post('/users/signup')
-        .send(data);
+        .send(validData);
 
       expect(status).to.equal(400);
       expect(body.message).to.equal(
@@ -109,33 +98,23 @@ describe('/users', () => {
     });
 
     it('returns 409 if a user with that name already exists', async () => {
-      const data1 = {
-        name: 'validName',
-        email: 'valid@email.com',
-        password: 'validPassword',
-      };
-      await request(app).post('/users/signup').send(data1);
+      await request(app).post('/users/signup').send(validData);
 
-      const data2 = {
+      const validData2 = {
         name: 'validName',
         email: 'valid2@email.com',
         password: 'validPassword',
       };
       const { status, body } = await request(app)
         .post('/users/signup')
-        .send(data2);
+        .send(validData2);
 
       expect(status).to.equal(409);
       expect(body.message).to.equal('Username already taken');
     });
 
     it('returns 409 if a user with that email already exists', async () => {
-      const data1 = {
-        name: 'validName',
-        email: 'valid@email.com',
-        password: 'validPassword',
-      };
-      await request(app).post('/users/signup').send(data1);
+      await request(app).post('/users/signup').send(validData);
 
       const data2 = {
         name: 'validName2',
@@ -152,12 +131,12 @@ describe('/users', () => {
   });
 
   describe('with records in the database', () => {
-    let data;
+    let validData;
     let users;
 
     beforeEach(async () => {
       try {
-        data = [];
+        validData = [];
         users = [];
         const data1 = {
           name: 'validName',
@@ -170,7 +149,7 @@ describe('/users', () => {
           password: await bcrypt.hash(data1.password, 10),
         });
         users.push(user1);
-        data.push(data1);
+        validData.push(data1);
 
         const data2 = {
           name: 'validName2',
@@ -182,7 +161,7 @@ describe('/users', () => {
           email: data2.email,
           password: await bcrypt.hash(data2.password, 10),
         });
-        data.push(data2);
+        validData.push(data2);
         users.push(user2);
 
         authStub.callsFake((req, _, next) => {
@@ -198,29 +177,29 @@ describe('/users', () => {
       it('logs user in if valid user exists and credentials match', async () => {
         const { status, body } = await request(app)
           .post('/users/login')
-          .send(data[0]);
+          .send(validData[0]);
 
         expect(status).to.equal(201);
-        expect(body.name).to.equal(data[0].name);
-        expect(body.email).to.equal(data[0].email);
+        expect(body.name).to.equal(validData[0].name);
+        expect(body.email).to.equal(validData[0].email);
       });
 
       it("returns 401 if password don't match", async () => {
-        data[0].password = 'differentPassword';
+        validData[0].password = 'differentPassword';
         const { status, body } = await request(app)
           .post('/users/login')
-          .send(data[0]);
+          .send(validData[0]);
 
         expect(status).to.equal(401);
         expect(body.message).to.equal('Authentication failed');
       });
 
       it("returns 401 if the email doesn't exist", async () => {
-        delete data[0].email;
+        delete validData[0].email;
 
         const { status, body } = await request(app)
           .post('/users/login')
-          .send(data[0]);
+          .send(validData[0]);
 
         expect(status).to.equal(401);
         expect(body.message).to.equal('Authentication failed');
@@ -232,9 +211,9 @@ describe('/users', () => {
         const { status, body } = await request(app).get('/users');
 
         expect(status).to.equal(200);
-        expect(body.length).to.equal(data.length);
+        expect(body.length).to.equal(validData.length);
         body.forEach((user) => {
-          const expected = data.find((item) => item.name === user.name);
+          const expected = validData.find((item) => item.name === user.name);
 
           expect(user.email).to.equal(expected.email);
         });
@@ -352,7 +331,7 @@ describe('/users', () => {
     describe('DELETE /users/:userId/:password', () => {
       it('deletes user by id', async () => {
         const user = users[0];
-        const userData = data[0];
+        const userData = validData[0];
         const { status } = await request(app).delete(
           `/users/${user.id}/${userData.password}`
         );
@@ -360,13 +339,13 @@ describe('/users', () => {
         const newUsersRecord = await User.findAll();
 
         expect(status).to.equal(204);
-        expect(newUsersRecord.length).to.equal(data.length - 1);
+        expect(newUsersRecord.length).to.equal(validData.length - 1);
         expect(newUsersRecord[0].id).to.not.equal(user.id);
       });
 
       it("returns 401 if the userId doesn't match to user.id (from token authentication)", async () => {
         const user = users[1];
-        const userData = data[1];
+        const userData = validData[1];
         const { status, body } = await request(app).delete(
           `/users/${user.id}/${userData.password}`
         );
